@@ -19,8 +19,8 @@ async function initializeDatabase() {
       const dbUrl = new URL(process.env.DATABASE_URL);
       pool = mysql.createPool({
         host: dbUrl.hostname,
-        user: dbUrl.username,
-        password: dbUrl.password,
+        user: decodeURIComponent(dbUrl.username),
+        password: decodeURIComponent(dbUrl.password),
         port: dbUrl.port || 3306,
         database: dbUrl.pathname.substring(1),
         ssl: { rejectUnauthorized: false }
@@ -59,7 +59,7 @@ async function initializeDatabase() {
     return pool;
   } catch (err) {
     console.error('Database connection failed. Please ensure MySQL is running and check your .env configurations.');
-    console.error('Error Details:', err.message);
+    console.error('Full Error:', err);
     throw err;
   }
 }
