@@ -13,7 +13,17 @@ let pool = null;
 
 async function initializeDatabase() {
   try {
-    // 1. Establish initial connection without database parameter to create it if missing
+    // If DATABASE_URL is provided (like from Aiven), use it directly
+    if (process.env.DATABASE_URL) {
+      console.log('Using DATABASE_URL for connection...');
+      pool = mysql.createPool(process.env.DATABASE_URL);
+      const conn = await pool.getConnection();
+      console.log('Connection pool successfully initialized via DATABASE_URL.');
+      conn.release();
+      return pool;
+    }
+
+    // Otherwise use standard fallback (Local Development)
     const tempConnection = await mysql.createConnection(dbConfig);
     console.log('Connected to MySQL host successfully.');
     
