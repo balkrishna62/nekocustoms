@@ -1,6 +1,4 @@
 -- Database Initialization Schema for Neko Customs Clearance Service Website
-CREATE DATABASE IF NOT EXISTS nekocustoms_db;
-USE nekocustoms_db;
 
 -- 1. Users Table (Admin Portal Authentication)
 CREATE TABLE IF NOT EXISTS users (

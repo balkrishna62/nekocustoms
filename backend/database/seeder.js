@@ -57,7 +57,7 @@ async function seedDatabase() {
     const defaultPassword = 'admin123456';
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
     
-    await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [
+    await pool.query('INSERT IGNORE INTO users (username, password) VALUES (?, ?)', [
       defaultUsername,
       hashedPassword
     ]);
@@ -125,7 +125,7 @@ async function seedDatabase() {
     };
 
     for (const [key, val] of Object.entries(defaultSettings)) {
-      await pool.query('INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?)', [key, val]);
+      await pool.query('INSERT IGNORE INTO site_settings (setting_key, setting_value) VALUES (?, ?)', [key, val]);
     }
     console.log('Site settings seeded.');
 
@@ -195,7 +195,7 @@ Customs officers examine the cargo under Green, Yellow, or Red channels, verify 
 
     for (const blog of defaultBlogs) {
       await pool.query(
-        'INSERT INTO blogs (title, slug, excerpt, content, category, cover_image, status, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT IGNORE INTO blogs (title, slug, excerpt, content, category, cover_image, status, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [blog.title, blog.slug, blog.excerpt, blog.content, blog.category, blog.cover_image, blog.status, blog.language]
       );
     }
@@ -235,7 +235,7 @@ Customs officers examine the cargo under Green, Yellow, or Red channels, verify 
 
     for (const notice of defaultNotices) {
       await pool.query(
-        'INSERT INTO notices (title, content, type, is_active, language) VALUES (?, ?, ?, ?, ?)',
+        'INSERT IGNORE INTO notices (title, content, type, is_active, language) VALUES (?, ?, ?, ?, ?)',
         [notice.title, notice.content, notice.type, notice.is_active, notice.language]
       );
     }
@@ -262,7 +262,7 @@ Customs officers examine the cargo under Green, Yellow, or Red channels, verify 
 
     for (const item of defaultGallery) {
       await pool.query(
-        'INSERT INTO gallery (title, description, image_url) VALUES (?, ?, ?)',
+        'INSERT IGNORE INTO gallery (title, description, image_url) VALUES (?, ?, ?)',
         [item.title, item.description, item.image_url]
       );
     }
@@ -310,7 +310,7 @@ Customs officers examine the cargo under Green, Yellow, or Red channels, verify 
 
     for (const rev of defaultReviews) {
       await pool.query(
-        'INSERT INTO reviews (name, company, rating, review_text, media_type, media_url, language) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        'INSERT IGNORE INTO reviews (name, company, rating, review_text, media_type, media_url, language) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [rev.name, rev.company, rev.rating, rev.review_text, rev.media_type, rev.media_url, rev.language]
       );
     }
