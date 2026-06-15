@@ -16,7 +16,19 @@ async function initializeDatabase() {
     // If DATABASE_URL is provided (like from Aiven), use it directly with explicit SSL
     if (process.env.DATABASE_URL) {
       console.log('Using DATABASE_URL for connection...');
-      const dbUrl = new URL(process.env.DATABASE_URL);
+      let dbUrlString = process.env.DATABASE_URL.trim();
+      
+      // If the user forgot the mysql:// protocol, the URL parser will fail silently and default to localhost
+      if (!dbUrlString.startsWith('mysql://')) {
+        throw new Error('DATABASE_URL is improperly formatted. It MUST start with "mysql://"');
+      }
+
+      const dbUrl = new URL(dbUrlString);
+      
+      if (!dbUrl.hostname) {
+        throw new Error('DATABASE_URL is missing the host name. Did you paste the complete Aiven Service URI?');
+      }
+
       pool = mysql.createPool({
         host: dbUrl.hostname,
         user: decodeURIComponent(dbUrl.username),
