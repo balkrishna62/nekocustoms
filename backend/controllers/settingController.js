@@ -27,16 +27,14 @@ exports.updateSettings = async (req, res) => {
       return res.status(400).json({ message: 'Invalid settings payload.' });
     }
 
-    // Update each configuration key-value pair in a transaction or sequential queries
-    const updatePromises = Object.entries(settings).map(([key, value]) => {
+    // Update each configuration key-value pair sequentially to avoid exhausting DB connection pool
+    for (const [key, value] of Object.entries(settings)) {
       const stringVal = value === null || value === undefined ? '' : String(value);
-      return pool.query(
+      await pool.query(
         'INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
         [key, stringVal, stringVal]
       );
-    });
-
-    await Promise.all(updatePromises);
+    }
     return res.json({ message: 'Site settings updated successfully.' });
   } catch (err) {
     console.error('Error updating settings:', err);
