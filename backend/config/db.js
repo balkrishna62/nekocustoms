@@ -13,12 +13,20 @@ let pool = null;
 
 async function initializeDatabase() {
   try {
-    // If DATABASE_URL is provided (like from Aiven), use it directly
+    // If DATABASE_URL is provided (like from Aiven), use it directly with explicit SSL
     if (process.env.DATABASE_URL) {
       console.log('Using DATABASE_URL for connection...');
-      pool = mysql.createPool(process.env.DATABASE_URL);
+      const dbUrl = new URL(process.env.DATABASE_URL);
+      pool = mysql.createPool({
+        host: dbUrl.hostname,
+        user: dbUrl.username,
+        password: dbUrl.password,
+        port: dbUrl.port || 3306,
+        database: dbUrl.pathname.substring(1),
+        ssl: { rejectUnauthorized: false }
+      });
       const conn = await pool.getConnection();
-      console.log('Connection pool successfully initialized via DATABASE_URL.');
+      console.log('Connection pool successfully initialized via DATABASE_URL with SSL.');
       conn.release();
       return pool;
     }
