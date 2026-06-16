@@ -3,10 +3,58 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const { getPool } = require('../config/db');
 
+async function migrateDatabaseUpdates() {
+  const pool = getPool();
+  console.log('Verifying database schema updates for staff tracker...');
+
+  // 1. Add columns to users table
+  const userColumns = [
+    { name: 'joining_date', type: 'DATE DEFAULT NULL' },
+    { name: 'competence_level', type: "VARCHAR(50) DEFAULT 'Intermediate'" },
+    { name: 'status', type: "VARCHAR(20) DEFAULT 'Active'" },
+    { name: 'notes', type: 'TEXT DEFAULT NULL' }
+  ];
+
+  for (const col of userColumns) {
+    try {
+      await pool.query(`ALTER TABLE users ADD COLUMN ${col.name} ${col.type}`);
+      console.log(`Added column ${col.name} to users table.`);
+    } catch (e) {
+      if (e.code === 'ER_DUP_FIELDNAME') {
+        // Column already exists
+      } else {
+        console.error(`Error adding column ${col.name}:`, e.message);
+      }
+    }
+  }
+
+  // 2. Create staff_reviews table
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS staff_reviews (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT,
+        reviewer_id INT,
+        rating INT DEFAULT 5,
+        review_text TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (staff_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (reviewer_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('staff_reviews table ensured.');
+  } catch (e) {
+    console.error('Error creating staff_reviews table:', e.message);
+  }
+}
+
 async function seedDatabase() {
   const pool = getPool();
   
   try {
+    // Run schema updates first
+    await migrateDatabaseUpdates();
+    
     console.log('Starting database seeding...');
     
     // Create uploads directory if missing
@@ -57,9 +105,10 @@ async function seedDatabase() {
     const defaultPassword = 'admin123456';
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
     
-    await pool.query('INSERT IGNORE INTO users (username, password) VALUES (?, ?)', [
+    await pool.query('INSERT IGNORE INTO users (username, password, role) VALUES (?, ?, ?)', [
       defaultUsername,
-      hashedPassword
+      hashedPassword,
+      'admin'
     ]);
     console.log('----------------------------------------');
     console.log('DEFAULT ADMIN CREATED:');

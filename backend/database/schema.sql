@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
+  role ENUM('admin', 'manager', 'staff') DEFAULT 'staff',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -84,4 +85,35 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
   p256dh VARCHAR(255) NOT NULL,
   auth VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 9. Tasks Table (Portal Work Tracking)
+CREATE TABLE IF NOT EXISTS tasks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  priority_rank ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+  deadline DATETIME,
+  fee_paid DECIMAL(10, 2) DEFAULT 0.00,
+  goods_details TEXT,
+  contact_number VARCHAR(50),
+  status ENUM('planned', 'ongoing', 'pending_approval', 'completed') DEFAULT 'planned',
+  assigned_to INT,
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- 10. Chat Messages Table (Portal Real-time Chat)
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  sender_id INT,
+  receiver_id INT,
+  message TEXT NOT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_read BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );

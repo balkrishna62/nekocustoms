@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import PortalApp from './PortalApp';
 import { SettingsProvider } from './context/SettingsContext';
 import { LanguageProvider } from './context/LanguageContext';
 
@@ -7,7 +8,6 @@ import { LanguageProvider } from './context/LanguageContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import NoticePopup from './components/NoticePopup';
-import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
 import Home from './pages/Home';
@@ -18,10 +18,25 @@ import BlogPost from './pages/BlogPost';
 import Contact from './pages/Contact';
 import Gallery from './pages/Gallery';
 import Services from './pages/Services';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
+  const isPortal = window.location.hostname === 'portal.bkpokharel.com.np' ||
+                   window.location.hostname === 'portal.balpokharel.com.np' ||
+                   window.location.hostname.startsWith('portal.') || 
+                   window.location.search.includes('portal=true') || 
+                   window.location.pathname.startsWith('/dashboard') || 
+                   window.location.pathname.startsWith('/login');
+
+  if (isPortal) {
+    return (
+      <SettingsProvider>
+        <LanguageProvider>
+          <PortalApp />
+        </LanguageProvider>
+      </SettingsProvider>
+    );
+  }
+
   return (
     <SettingsProvider>
       <LanguageProvider>
@@ -41,17 +56,6 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/services" element={<Services />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                
-                {/* Protected dashboard endpoints */}
-                <Route 
-                  path="/admin/dashboard" 
-                  element={
-                    <ProtectedRoute>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  } 
-                />
               </Routes>
             </main>
 

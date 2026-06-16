@@ -108,9 +108,9 @@ const Footer = () => {
         <div className="footer-bottom">
           <p>© {new Date().getFullYear()} {language === 'np' ? settings.site_name_np || 'नेको भन्सार' : settings.site_name}. {t('footer_copy')}</p>
           <div className="footer-bottom-links">
-            <Link to="/admin/login" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            <a href="/login" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textDecoration: 'none' }}>
               {t('footer_portal')}
-            </Link>
+            </a>
           </div>
         </div>
       </div>

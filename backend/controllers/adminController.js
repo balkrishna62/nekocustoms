@@ -27,7 +27,7 @@ exports.login = async (req, res) => {
 
     // Sign JWT
     const token = jwt.sign(
-      { id: user.id, username: user.username },
+      { id: user.id, username: user.username, role: user.role },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -36,7 +36,8 @@ exports.login = async (req, res) => {
       token,
       user: {
         id: user.id,
-        username: user.username
+        username: user.username,
+        role: user.role
       }
     });
   } catch (err) {
@@ -52,7 +53,8 @@ exports.verifyToken = async (req, res) => {
       valid: true,
       user: {
         id: req.user.id,
-        username: req.user.username
+        username: req.user.username,
+        role: req.user.role
       }
     });
   } catch (err) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Sun, Moon, Menu, X, ShieldAlert } from 'lucide-react';
+import { Sun, Moon, Menu, X } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 import { useTranslation } from '../context/LanguageContext';
 
@@ -17,8 +17,6 @@ const Header = () => {
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
-
-  const isAdminLoggedIn = !!localStorage.getItem('token');
 
   return (
     <header className="header">
@@ -93,17 +91,6 @@ const Header = () => {
               onClick={closeMobileMenu}
             >
               {t('nav_contact')}
-            </NavLink>
-          )}
-
-          {isAdminLoggedIn && (
-            <NavLink 
-              to="/admin/dashboard" 
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-              onClick={closeMobileMenu}
-              style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--accent-gold)' }}
-            >
-              <ShieldAlert size={16} /> {t('nav_admin')}
             </NavLink>
           )}
         </nav>
